@@ -1,5 +1,6 @@
 package nz.co.dhafir.supplier.api.resource.email.v1;
 
+import lombok.extern.slf4j.Slf4j;
 import nz.co.dhafir.supplier.api.dto.EmailDTO;
 import nz.co.dhafir.supplier.api.ResponseWrapper;
 import nz.co.dhafir.supplier.domain.Email;
@@ -10,10 +11,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Creates and updates single email
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/suppliers/{supplierId}/emails")
 public class EmailResourceV1 {
@@ -50,39 +53,67 @@ public class EmailResourceV1 {
      */
     @GetMapping("/{emailId}")
     public ResponseWrapper getSupplierEmailByEmailId(@PathVariable long supplierId, @PathVariable long emailId) {
-        return ResponseWrapper.builder()
-                .data(emailServiceStub.findSupplierEmailByEmailId(supplierId, emailId))
+        try {
+            Optional<Email> maybeEmail = emailServiceStub.findSupplierEmailByEmailId(supplierId, emailId);
+
+            if (maybeEmail.isEmpty()) {
+                return errorResponse("Email not found with Id : " + emailId);
+            }
+
+            return ResponseWrapper.builder()
+                .data(emailBeanMapper.fromEmailToEmailDTO(maybeEmail.get()))
                 .build();
+        } catch (Exception exp) {
+            return errorResponse("Couldn't get supplier email with email Id:" + emailId);
+        }
     }
 
     @PostMapping("/draft")
     public ResponseWrapper createEmail(@PathVariable long supplierId, @RequestBody EmailDTO emailDto) {
-        // Implementation to save a draft email
+        try {
         Email email = emailServiceStub.saveDraftEmail(supplierId, emailBeanMapper.fromEmailDtoToEmail(emailDto));
         return ResponseWrapper.builder()
                 .status(ResponseWrapper.STATUS.SUCCESS)
                 .message("Email created successfully")
                 .data(emailBeanMapper.fromEmailToEmailDTO(email))
                 .build();
+        } catch (Exception exp) {
+            return errorResponse("Couldn't create draft email");
+        }
     }
 
     @PostMapping("/{emailId}/send")
     public ResponseWrapper sendEmail(@PathVariable long supplierId,  @RequestBody EmailDTO emailDto) {
-        // Implementation to send an email
+        try {
         emailServiceStub.sendEmail(supplierId, emailBeanMapper.fromEmailDtoToEmail(emailDto));
         return  ResponseWrapper.builder()
                 .status(ResponseWrapper.STATUS.SUCCESS)
                 .message("Email sent successfully")
                 .build();
+        } catch (Exception exp) {
+            log.error("Sending email failed.", exp);
+            return errorResponse("Couldn't send email Id:" + emailDto.getId());
+        }
     }
 
     @PutMapping("/{emailId}/recipients")
-    public ResponseWrapper updateRecipients(@PathVariable long supplierId, @PathVariable long emailId, @RequestBody List<String> recipients) {
-        emailServiceStub.updateEmailRecipients(supplierId, emailId, recipients);
-        return  ResponseWrapper.builder()
-                .status(ResponseWrapper.STATUS.SUCCESS)
-                .message( "Email with ID " + emailId + " updated recipients successfully")
-                .build();
+    public ResponseWrapper updateRecipients(@PathVariable long supplierId, @PathVariable long emailId, @RequestBody EmailDTO emailDto) {
+        try {
+            emailServiceStub.updateEmailRecipients(supplierId, emailId, emailDto.getRecipients());
+            return ResponseWrapper.builder()
+                    .status(ResponseWrapper.STATUS.SUCCESS)
+                    .message("Email with ID " + emailId + " updated recipients successfully")
+                    .build();
+        } catch (Exception exp) {
+            log.error("updating email recipients failed.", exp);
+            return errorResponse("Couldn't update recipients for email with Id:" + emailId);
+        }
     }
 
+    private ResponseWrapper errorResponse(String errorMessage) {
+        return ResponseWrapper.builder()
+                .status(ResponseWrapper.STATUS.ERROR)
+                .message(errorMessage)
+                .build();
+    }
 }

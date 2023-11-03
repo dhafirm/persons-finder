@@ -1,6 +1,7 @@
 package nz.co.dhafir.supplier.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseWrapper {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     public STATUS status = STATUS.SUCCESS;

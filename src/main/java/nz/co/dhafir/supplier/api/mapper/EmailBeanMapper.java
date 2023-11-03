@@ -37,6 +37,7 @@ public class EmailBeanMapper {
        email.setSubject(email.getSubject());
        email.setBody(emailDto.getBody());
        email.setSender(emailDto.getSender());
+       email.setSubject(emailDto.getSubject());
        email.setRecipients(List.copyOf(emailDto.getRecipients()));
        return email;
     }

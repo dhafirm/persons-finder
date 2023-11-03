@@ -50,7 +50,7 @@ public class EmailDAOStub implements EmailDAO {
         if (CollectionUtils.isEmpty(supplierEmails)) {
             supplierEmails = new ArrayList<>();
 
-            emails.put( SupplierId.of(supplierId), new ArrayList<>());
+            emails.put( SupplierId.of(supplierId), supplierEmails);
         }
         supplierEmails.add(email);
         return email;
@@ -65,9 +65,9 @@ public class EmailDAOStub implements EmailDAO {
         }
 
         Email emailToUpdate = supplierEmail.get();
-        emailToUpdate.getRecipients().clear();
-        emailToUpdate.getRecipients().addAll(recipients);
-
+       // emailToUpdate.getRecipients().clear();
+        //emailToUpdate.getRecipients().addAll(recipients);
+        emailToUpdate.setRecipients(new ArrayList<>(recipients));
         log.info("Updated email recipients for supplier {} and email wit emailId {}", supplierId, emailId);
         return emailToUpdate;
     }
