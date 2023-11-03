@@ -7,14 +7,16 @@ import nz.co.dhafir.supplier.domain.Email;
 import nz.co.dhafir.supplier.error.EmailException;
 import nz.co.dhafir.supplier.types.SupplierId;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
+
 @Slf4j
+@Repository
 public class EmailDAOStub implements EmailDAO {
     private static long emailId = 1000;
 
@@ -40,21 +42,18 @@ public class EmailDAOStub implements EmailDAO {
 
     @Override
     public Email saveDraftEmail(long supplierId, Email email) {
-        Email draftEmail = Email.builder().
-                id(emailId++)
-                .body(email.getBody())
-                .subject(email.getSubject())
-                .sender(email.getSender())
-                .recipients(email.getRecipients())
-                .body(email.getBody())
-                .build();
+        if (email.getId() == 0) {
+            email.setId(emailId++);
+        }
+
         List<Email> supplierEmails = findSupplierEmails(supplierId);
         if (CollectionUtils.isEmpty(supplierEmails)) {
             supplierEmails = new ArrayList<>();
-            emails.put( new SupplierId(supplierId), new ArrayList<>());
+
+            emails.put( SupplierId.of(supplierId), new ArrayList<>());
         }
-        supplierEmails.add(draftEmail)
-        return draftEmail;
+        supplierEmails.add(email);
+        return email;
     }
 
     @Override

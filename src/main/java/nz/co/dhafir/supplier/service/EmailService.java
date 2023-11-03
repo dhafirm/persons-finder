@@ -1,21 +1,14 @@
 package nz.co.dhafir.supplier.service;
 
+import lombok.extern.slf4j.Slf4j;
 import nz.co.dhafir.supplier.domain.Email;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+@Slf4j
+@Service
+public class EmailService {
 
-public interface EmailService {
-
-    List<Email> findSupplierEmails(long supplierId);
-
-
-    Optional<Email> findSupplierEmailByEmailId(long supplierId, long emailId);
-
-    Email saveDraftEmail(long supplierId, Email email);
-
-    Email sendEmail(long supplierId, Email email);
-
-    Email updateEmailRecipients(long supplierId, long emailId, List<String> recipients);
-
+    public void sendEmail(Email email) {
+        log.info("EMail successfully sent. Email Id : {}", email.getId());
+    }
 }

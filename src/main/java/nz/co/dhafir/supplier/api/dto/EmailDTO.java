@@ -18,7 +18,6 @@ public class EmailDTO {
     private String body;
     private String sender;
     private List<String> recipients;
-    private boolean draft = true;
 
     // can add attachments later on
 }
