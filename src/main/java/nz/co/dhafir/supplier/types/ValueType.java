@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import java.util.Objects;
 
 /**
- * A wrapper around primitive types to give them readable and type safe
+ * A wrapper around primitive types to make them readable and type safe.
  * @param <T>
  */
 @AllArgsConstructor
