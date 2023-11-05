@@ -1,4 +1,4 @@
-package nz.co.dhafir.supplier.api.dto;
+package nz.co.dhafir.supplier.api.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -14,12 +13,14 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EmailDTO {
+public class EmailResponseDTO {
     private long id;
+
     private String subject;
     private String body;
     private String sender;
     private List<String> recipients;
+    private boolean draft;
 
     // can add attachments later on
 }

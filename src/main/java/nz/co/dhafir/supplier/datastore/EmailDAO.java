@@ -1,4 +1,4 @@
-package nz.co.dhafir.supplier.datastore.dao;
+package nz.co.dhafir.supplier.datastore;
 
 import nz.co.dhafir.supplier.domain.Email;
 
@@ -10,7 +10,7 @@ public interface EmailDAO {
 
     Optional<Email> findSupplierEmailByEmailId(long supplierId, long emailId);
 
-    Email saveDraftEmail(long supplierId, Email email);
+    Email createDraftEmail(long supplierId, Email email);
 
     Email updateEmailRecipients(long supplierId, long emailId, List<String> recipients);
 }

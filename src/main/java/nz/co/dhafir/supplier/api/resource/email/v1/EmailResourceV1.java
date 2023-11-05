@@ -1,8 +1,8 @@
 package nz.co.dhafir.supplier.api.resource.email.v1;
 
 import lombok.extern.slf4j.Slf4j;
-import nz.co.dhafir.supplier.api.dto.EmailDTO;
 import nz.co.dhafir.supplier.api.ResponseWrapper;
+import nz.co.dhafir.supplier.api.dto.request.EmailRequestDTO;
 import nz.co.dhafir.supplier.domain.Email;
 import nz.co.dhafir.supplier.api.mapper.EmailBeanMapper;
 import nz.co.dhafir.supplier.manager.SupplierEmailManager;
@@ -39,7 +39,7 @@ public class EmailResourceV1 {
         if (CollectionUtils.isEmpty(emails)) {
             response.setMessage("No emails were found for supplier with Id: " + supplierId);
         } else {
-            response.setData(emailBeanMapper.fromEmailToEmailDTO(emails));
+            response.setData(emailBeanMapper.fromDomainToEmailResponseDTOList(emails));
         }
 
         return response;
@@ -61,7 +61,7 @@ public class EmailResourceV1 {
             }
 
             return ResponseWrapper.builder()
-                .data(emailBeanMapper.fromEmailToEmailDTO(maybeEmail.get()))
+                .data(emailBeanMapper.fromDomainToEmailResponseDTO(maybeEmail.get()))
                 .build();
         } catch (Exception exp) {
             return errorResponse("Couldn't get supplier email with email Id:" + emailId);
@@ -69,35 +69,59 @@ public class EmailResourceV1 {
     }
 
     @PostMapping("/draft")
-    public ResponseWrapper createEmail(@PathVariable long supplierId, @RequestBody EmailDTO emailDto) {
+    public ResponseWrapper createEmail(@PathVariable long supplierId,
+                                       @RequestBody EmailRequestDTO emailDto) {
         try {
-        Email email = emailServiceStub.saveDraftEmail(supplierId, emailBeanMapper.fromEmailDtoToEmail(emailDto));
+        Email email = emailServiceStub.saveDraftEmail(supplierId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
         return ResponseWrapper.builder()
                 .status(ResponseWrapper.STATUS.SUCCESS)
                 .message("Email created successfully")
-                .data(emailBeanMapper.fromEmailToEmailDTO(email))
+                .data(emailBeanMapper.fromDomainToEmailResponseDTO(email))
                 .build();
         } catch (Exception exp) {
             return errorResponse("Couldn't create draft email");
         }
     }
 
-    @PostMapping("/{emailId}/send")
-    public ResponseWrapper sendEmail(@PathVariable long supplierId,  @RequestBody EmailDTO emailDto) {
+    @PostMapping("/send")
+    public ResponseWrapper sendEmail(@PathVariable long supplierId,
+                                     @RequestBody EmailRequestDTO emailDto) {
         try {
-        emailServiceStub.sendEmail(supplierId, emailBeanMapper.fromEmailDtoToEmail(emailDto));
+        emailServiceStub.sendEmail(supplierId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
         return  ResponseWrapper.builder()
                 .status(ResponseWrapper.STATUS.SUCCESS)
                 .message("Email sent successfully")
                 .build();
         } catch (Exception exp) {
             log.error("Sending email failed.", exp);
-            return errorResponse("Couldn't send email Id:" + emailDto.getId());
+            return errorResponse("Couldn't send email Id:");
         }
     }
 
+    /**
+     * Send a draft email.
+     * @param supplierId
+     * @param emailId
+     * @return
+     */
+    @PostMapping("/{emailId}/send")
+    public ResponseWrapper sendEmail(@PathVariable long supplierId,
+                                     @PathVariable long emailId) {
+        try {
+            emailServiceStub.sendEmail(supplierId, emailId);
+            return  ResponseWrapper.builder()
+                    .status(ResponseWrapper.STATUS.SUCCESS)
+                    .message("Email sent successfully")
+                    .build();
+        } catch (Exception exp) {
+            log.error("Sending email failed.", exp);
+            return errorResponse("Couldn't send email Id:");
+        }
+    }
     @PutMapping("/{emailId}/recipients")
-    public ResponseWrapper updateRecipients(@PathVariable long supplierId, @PathVariable long emailId, @RequestBody EmailDTO emailDto) {
+    public ResponseWrapper updateRecipients(@PathVariable long supplierId,
+                                            @PathVariable long emailId,
+                                            @RequestBody EmailRequestDTO emailDto) {
         try {
             emailServiceStub.updateEmailRecipients(supplierId, emailId, emailDto.getRecipients());
             return ResponseWrapper.builder()
@@ -106,6 +130,29 @@ public class EmailResourceV1 {
                     .build();
         } catch (Exception exp) {
             log.error("updating email recipients failed.", exp);
+            return errorResponse("Couldn't update recipients for email with Id:" + emailId);
+        }
+    }
+
+    /**
+     * Updates a draft email. All specified properties will be updated.
+     * @param supplierId
+     * @param emailId
+     * @param emailDto
+     * @return
+     */
+    @PutMapping("/{emailId}/draft")
+    public ResponseWrapper updateRDraft(@PathVariable long supplierId,
+                                            @PathVariable long emailId,
+                                            @RequestBody EmailRequestDTO emailDto) {
+        try {
+            emailServiceStub.updateDraft(supplierId, emailId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
+            return ResponseWrapper.builder()
+                    .status(ResponseWrapper.STATUS.SUCCESS)
+                    .message("Email with ID " + emailId + " updated successfully")
+                    .build();
+        } catch (Exception exp) {
+            log.error("updating draft email failed.", exp);
             return errorResponse("Couldn't update recipients for email with Id:" + emailId);
         }
     }

@@ -1,14 +1,13 @@
 package nz.co.dhafir.supplier.manager;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import nz.co.dhafir.supplier.datastore.dao.impl.EmailDAOStub;
+import nz.co.dhafir.supplier.datastore.impl.EmailDAOStub;
 import nz.co.dhafir.supplier.domain.Email;
+import nz.co.dhafir.supplier.error.EmailNotFoundException;
 import nz.co.dhafir.supplier.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,27 +35,48 @@ public class SupplierEmailManagerStub implements SupplierEmailManager {
 
     @Override
     public Email saveDraftEmail(long supplierId, @NotNull final Email email) {
-        return emailDAOStub.saveDraftEmail(supplierId, email);
+        return emailDAOStub.createDraftEmail(supplierId, email);
+    }
+
+    /**
+     * Saves the email. If the email doesn't exist then it will add it to the datastore first.
+     * @param supplierId
+     * @param emailId
+     */
+    @Override
+    public Email sendEmail(long supplierId, long emailId) {
+        // find draft email
+        Optional<Email> maybeEmail = findSupplierEmailByEmailId(supplierId, emailId);
+
+        if (maybeEmail.isEmpty()) {
+            // new Email, save it
+            throw new EmailNotFoundException();
+        }
+
+        Email email = maybeEmail.get();
+        emailSender.sendEmail(email);
+        email.setDraft(false);
+        return email;
     }
 
     @Override
-    public void sendEmail(long supplierId, @NotNull final Email emailToSend) {
+    public Email sendEmail(long supplierId, @NotNull final Email emailToSend) {
         // update/save the email first
-        emailToSend.setDraft(false);
-        if (emailToSend.getId() == 0) {
-            // new Email, save
-            saveDraftEmail(supplierId, emailToSend);
-        }
+        Email email = saveDraftEmail(supplierId, emailToSend);
 
-        emailSender.sendEmail(emailToSend);
+        emailSender.sendEmail(email);
+        email.setDraft(false);
+        return email;
     }
 
     @Override
-    public void updateEmailRecipients(long supplierId, long emailId, List<String> recipients) {
-        if (CollectionUtils.isEmpty(recipients)) {
-            return ;
-        }
+    public Email updateEmailRecipients(long supplierId, long emailId,  List<String> recipients) {
+        return emailDAOStub.updateEmailRecipients(supplierId, emailId, recipients);
+    }
 
-        emailDAOStub.updateEmailRecipients(supplierId, emailId, recipients);
+    @Override
+    public Email updateDraft(long supplierId, long emailId, Email email) {
+        // find draft email
+        return emailDAOStub.updateDraftEmail(supplierId, emailId, email);
     }
 }

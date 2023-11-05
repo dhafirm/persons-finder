@@ -14,8 +14,22 @@ public interface SupplierEmailManager {
 
     Email saveDraftEmail(long supplierId, Email email);
 
-    void sendEmail(long supplierId, Email email);
+    /**
+     * Save and send the new email.
+     * @param supplierId
+     * @param email
+     */
+    Email sendEmail(long supplierId, Email email);
 
-    void updateEmailRecipients(long supplierId, long emailId, List<String> recipients);
+    /**
+     * Send the email with the given email ID
+     * @param supplierId
+     * @param emailId
+     */
+    Email sendEmail(long supplierId, long emailId);
+
+    Email updateEmailRecipients(long supplierId, long emailId, List<String> recipients);
+
+    Email updateDraft(long supplierId, long emailId, Email email);
 
 }

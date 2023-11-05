@@ -1,18 +1,17 @@
-package nz.co.dhafir.supplier.datastore.dao.impl;
+package nz.co.dhafir.supplier.datastore.impl;
 
-import jakarta.websocket.server.ServerEndpoint;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nz.co.dhafir.supplier.datastore.dao.EmailDAO;
+import nz.co.dhafir.supplier.datastore.EmailDAO;
 import nz.co.dhafir.supplier.domain.Email;
 import nz.co.dhafir.supplier.error.EmailException;
+import nz.co.dhafir.supplier.error.EmailNotFoundException;
 import nz.co.dhafir.supplier.types.SupplierId;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -20,6 +19,10 @@ import java.util.stream.Collectors;
 public class EmailDAOStub implements EmailDAO {
     private static long emailId = 1000;
 
+    /**
+     * Simple data storage of Emails per Supplier.
+     * Better to make List<Email> a property of Supplier in a one-to-many relationsship.
+     */
     private Map<SupplierId, List<Email>> emails;
 
     public EmailDAOStub() {
@@ -41,11 +44,9 @@ public class EmailDAOStub implements EmailDAO {
     }
 
     @Override
-    public Email saveDraftEmail(long supplierId, Email email) {
-        if (email.getId() == 0) {
-            email.setId(emailId++);
-        }
+    public Email createDraftEmail(long supplierId, Email email) {
 
+        email.setId(emailId++);
         List<Email> supplierEmails = findSupplierEmails(supplierId);
         if (CollectionUtils.isEmpty(supplierEmails)) {
             supplierEmails = new ArrayList<>();
@@ -53,6 +54,22 @@ public class EmailDAOStub implements EmailDAO {
             emails.put( SupplierId.of(supplierId), supplierEmails);
         }
         supplierEmails.add(email);
+        return email;
+    }
+
+    public Email updateDraftEmail(long supplierId, long emailId, Email emailToSave) {
+        // find email
+        Optional<Email> maybeEmail = findSupplierEmailByEmailId(supplierId, emailId);
+        if (maybeEmail.isEmpty()) {
+            throw new EmailNotFoundException();
+        }
+
+        Email email = maybeEmail.get();
+        email.setBody(emailToSave.getBody());
+        email.setSubject(emailToSave.getSubject());
+        email.setSender(emailToSave.getSender());
+        email.setRecipients(emailToSave.getRecipients());
+
         return email;
     }
 
