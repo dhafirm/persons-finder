@@ -1,6 +1,7 @@
 package nz.co.dhafir.supplier.api.mapper;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import nz.co.dhafir.supplier.api.dto.request.EmailRequestDTO;
 import nz.co.dhafir.supplier.api.dto.response.EmailResponseDTO;
 import nz.co.dhafir.supplier.domain.Email;
@@ -14,16 +15,18 @@ import java.util.stream.Collectors;
  * TODO Use mapstruct library for easy bean mapping.
  */
 @Component
+@Slf4j
 public class EmailBeanMapper {
 
    public EmailResponseDTO fromDomainToEmailResponseDTO(@NotNull Email email) {
-        return EmailResponseDTO.builder()
+       log.info("Email draft status:" + email.isSent());
+       return EmailResponseDTO.builder()
                 .id(email.getId())
                 .sender(email.getSender())
                 .recipients(List.copyOf(email.getRecipients()))
                 .body(email.getBody())
                 .subject(email.getSubject())
-                .draft(email.isDraft())
+                .sent(email.isSent())
                 .build();
 
    }

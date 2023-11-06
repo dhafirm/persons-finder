@@ -87,14 +87,16 @@ public class EmailResourceV1 {
     public ResponseWrapper sendEmail(@PathVariable long supplierId,
                                      @RequestBody EmailRequestDTO emailDto) {
         try {
-        emailServiceStub.sendEmail(supplierId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
-        return  ResponseWrapper.builder()
+
+            Email email = emailBeanMapper.fromEmailRequestDtoToDomain(emailDto);
+            emailServiceStub.sendEmail(supplierId, email);
+            return  ResponseWrapper.builder()
                 .status(ResponseWrapper.STATUS.SUCCESS)
                 .message("Email sent successfully")
                 .build();
         } catch (Exception exp) {
             log.error("Sending email failed.", exp);
-            return errorResponse("Couldn't send email Id:");
+            return errorResponse("Couldn't send email.");
         }
     }
 
@@ -123,9 +125,10 @@ public class EmailResourceV1 {
                                             @PathVariable long emailId,
                                             @RequestBody EmailRequestDTO emailDto) {
         try {
-            emailServiceStub.updateEmailRecipients(supplierId, emailId, emailDto.getRecipients());
+            Email updatedEmail = emailServiceStub.updateEmailRecipients(supplierId, emailId, emailDto.getRecipients());
             return ResponseWrapper.builder()
                     .status(ResponseWrapper.STATUS.SUCCESS)
+                    .data(emailBeanMapper.fromDomainToEmailResponseDTO(updatedEmail))
                     .message("Email with ID " + emailId + " updated recipients successfully")
                     .build();
         } catch (Exception exp) {
@@ -141,14 +144,15 @@ public class EmailResourceV1 {
      * @param emailDto
      * @return
      */
-    @PutMapping("/{emailId}/draft")
-    public ResponseWrapper updateRDraft(@PathVariable long supplierId,
+    @PutMapping("/{emailId}/u")
+    public ResponseWrapper updateDraft(@PathVariable long supplierId,
                                             @PathVariable long emailId,
                                             @RequestBody EmailRequestDTO emailDto) {
         try {
-            emailServiceStub.updateDraft(supplierId, emailId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
+            Email updatedEmail = emailServiceStub.updateDraft(supplierId, emailId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
             return ResponseWrapper.builder()
                     .status(ResponseWrapper.STATUS.SUCCESS)
+                    .data(emailBeanMapper.fromDomainToEmailResponseDTO(updatedEmail))
                     .message("Email with ID " + emailId + " updated successfully")
                     .build();
         } catch (Exception exp) {

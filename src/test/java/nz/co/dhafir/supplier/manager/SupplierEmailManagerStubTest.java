@@ -56,7 +56,7 @@ class SupplierEmailManagerStubTest {
         when(emailDAOStub.createDraftEmail(100L, email)).thenReturn(email);
         supplierEmailManagerStub.sendEmail(100L, email);
         verify(emailService).sendEmail(email);
-        assertFalse(email.isDraft());
+        assertFalse(email.isSent());
     }
 
     @Test

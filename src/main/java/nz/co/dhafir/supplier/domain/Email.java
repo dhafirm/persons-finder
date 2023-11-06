@@ -26,5 +26,7 @@ public class Email {
     private String body;
     private String sender;
     private List<String> recipients = new ArrayList<>();
-    private boolean draft = true;
+
+    //TODO use EmailStatus
+    private boolean sent;
 }

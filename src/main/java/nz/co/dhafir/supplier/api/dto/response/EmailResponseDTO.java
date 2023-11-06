@@ -20,7 +20,9 @@ public class EmailResponseDTO {
     private String body;
     private String sender;
     private List<String> recipients;
-    private boolean draft;
+
+    //TODO use EmailStatus
+    private boolean sent;
 
     // can add attachments later on
 }

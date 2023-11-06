@@ -35,6 +35,7 @@ public class SupplierEmailManagerStub implements SupplierEmailManager {
 
     @Override
     public Email saveDraftEmail(long supplierId, @NotNull final Email email) {
+        log.info("Saving draft email with subject :" + email.getSubject() + " for supplier: " + supplierId);
         return emailDAOStub.createDraftEmail(supplierId, email);
     }
 
@@ -45,6 +46,7 @@ public class SupplierEmailManagerStub implements SupplierEmailManager {
      */
     @Override
     public Email sendEmail(long supplierId, long emailId) {
+        log.info("Sending draft email with emailId :" + emailId + " for supplier: " + supplierId);
         // find draft email
         Optional<Email> maybeEmail = findSupplierEmailByEmailId(supplierId, emailId);
 
@@ -55,28 +57,30 @@ public class SupplierEmailManagerStub implements SupplierEmailManager {
 
         Email email = maybeEmail.get();
         emailSender.sendEmail(email);
-        email.setDraft(false);
+        email.setSent(true);
         return email;
     }
 
     @Override
     public Email sendEmail(long supplierId, @NotNull final Email emailToSend) {
+        log.info("Sending new email with subject :" + emailToSend.getSubject() + " for supplier: " + supplierId);
         // update/save the email first
         Email email = saveDraftEmail(supplierId, emailToSend);
 
         emailSender.sendEmail(email);
-        email.setDraft(false);
+        email.setSent(true);
         return email;
     }
 
     @Override
     public Email updateEmailRecipients(long supplierId, long emailId,  List<String> recipients) {
+        // TODO validate can only update draft emails (not sent yet)
         return emailDAOStub.updateEmailRecipients(supplierId, emailId, recipients);
     }
 
     @Override
     public Email updateDraft(long supplierId, long emailId, Email email) {
-        // find draft email
+        // TODO validate can only update draft emails (not sent yet)
         return emailDAOStub.updateDraftEmail(supplierId, emailId, email);
     }
 }
