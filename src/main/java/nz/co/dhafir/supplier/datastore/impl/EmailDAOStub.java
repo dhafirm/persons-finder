@@ -7,6 +7,7 @@ import nz.co.dhafir.supplier.datastore.EmailDAO;
 import nz.co.dhafir.supplier.domain.Email;
 import nz.co.dhafir.supplier.error.EmailException;
 import nz.co.dhafir.supplier.error.EmailNotFoundException;
+import nz.co.dhafir.supplier.types.EmailStatus;
 import nz.co.dhafir.supplier.types.SupplierId;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -45,7 +46,7 @@ public class EmailDAOStub implements EmailDAO {
 
     @Override
     public Email createDraftEmail(long supplierId, Email email) {
-
+        email.setStatus(EmailStatus.DRAFT);
         email.setId(emailId++);
         List<Email> supplierEmails = findSupplierEmails(supplierId);
         if (CollectionUtils.isEmpty(supplierEmails)) {

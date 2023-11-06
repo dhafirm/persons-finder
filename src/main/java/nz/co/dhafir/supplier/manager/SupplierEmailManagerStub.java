@@ -6,6 +6,7 @@ import nz.co.dhafir.supplier.datastore.impl.EmailDAOStub;
 import nz.co.dhafir.supplier.domain.Email;
 import nz.co.dhafir.supplier.error.EmailNotFoundException;
 import nz.co.dhafir.supplier.service.EmailService;
+import nz.co.dhafir.supplier.types.EmailStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +58,7 @@ public class SupplierEmailManagerStub implements SupplierEmailManager {
 
         Email email = maybeEmail.get();
         emailSender.sendEmail(email);
-        email.setSent(true);
+        email.setStatus(EmailStatus.SENT);
         return email;
     }
 
@@ -68,7 +69,7 @@ public class SupplierEmailManagerStub implements SupplierEmailManager {
         Email email = saveDraftEmail(supplierId, emailToSend);
 
         emailSender.sendEmail(email);
-        email.setSent(true);
+        email.setStatus(EmailStatus.SENT);
         return email;
     }
 

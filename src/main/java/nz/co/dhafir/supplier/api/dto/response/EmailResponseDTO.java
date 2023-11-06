@@ -1,10 +1,12 @@
 package nz.co.dhafir.supplier.api.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nz.co.dhafir.supplier.types.EmailStatus;
 
 import java.util.List;
 
@@ -21,8 +23,8 @@ public class EmailResponseDTO {
     private String sender;
     private List<String> recipients;
 
-    //TODO use EmailStatus
-    private boolean sent;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private EmailStatus status;
 
     // can add attachments later on
 }

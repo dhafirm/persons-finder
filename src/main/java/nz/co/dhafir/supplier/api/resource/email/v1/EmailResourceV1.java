@@ -74,7 +74,7 @@ public class EmailResourceV1 {
         try {
         Email email = emailServiceStub.saveDraftEmail(supplierId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
         return ResponseWrapper.builder()
-                .status(ResponseWrapper.STATUS.SUCCESS)
+                .status(ResponseWrapper.Status.SUCCESS)
                 .message("Email created successfully")
                 .data(emailBeanMapper.fromDomainToEmailResponseDTO(email))
                 .build();
@@ -91,7 +91,7 @@ public class EmailResourceV1 {
             Email email = emailBeanMapper.fromEmailRequestDtoToDomain(emailDto);
             emailServiceStub.sendEmail(supplierId, email);
             return  ResponseWrapper.builder()
-                .status(ResponseWrapper.STATUS.SUCCESS)
+                .status(ResponseWrapper.Status.SUCCESS)
                 .message("Email sent successfully")
                 .build();
         } catch (Exception exp) {
@@ -112,7 +112,7 @@ public class EmailResourceV1 {
         try {
             emailServiceStub.sendEmail(supplierId, emailId);
             return  ResponseWrapper.builder()
-                    .status(ResponseWrapper.STATUS.SUCCESS)
+                    .status(ResponseWrapper.Status.SUCCESS)
                     .message("Email sent successfully")
                     .build();
         } catch (Exception exp) {
@@ -127,7 +127,7 @@ public class EmailResourceV1 {
         try {
             Email updatedEmail = emailServiceStub.updateEmailRecipients(supplierId, emailId, emailDto.getRecipients());
             return ResponseWrapper.builder()
-                    .status(ResponseWrapper.STATUS.SUCCESS)
+                    .status(ResponseWrapper.Status.SUCCESS)
                     .data(emailBeanMapper.fromDomainToEmailResponseDTO(updatedEmail))
                     .message("Email with ID " + emailId + " updated recipients successfully")
                     .build();
@@ -151,7 +151,7 @@ public class EmailResourceV1 {
         try {
             Email updatedEmail = emailServiceStub.updateDraft(supplierId, emailId, emailBeanMapper.fromEmailRequestDtoToDomain(emailDto));
             return ResponseWrapper.builder()
-                    .status(ResponseWrapper.STATUS.SUCCESS)
+                    .status(ResponseWrapper.Status.SUCCESS)
                     .data(emailBeanMapper.fromDomainToEmailResponseDTO(updatedEmail))
                     .message("Email with ID " + emailId + " updated successfully")
                     .build();
@@ -163,7 +163,7 @@ public class EmailResourceV1 {
 
     private ResponseWrapper errorResponse(String errorMessage) {
         return ResponseWrapper.builder()
-                .status(ResponseWrapper.STATUS.ERROR)
+                .status(ResponseWrapper.Status.ERROR)
                 .message(errorMessage)
                 .build();
     }

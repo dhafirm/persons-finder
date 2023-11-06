@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nz.co.dhafir.supplier.types.EmailStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,5 @@ public class Email {
     private String sender;
     private List<String> recipients = new ArrayList<>();
 
-    //TODO use EmailStatus
-    private boolean sent;
+    private EmailStatus status;
 }

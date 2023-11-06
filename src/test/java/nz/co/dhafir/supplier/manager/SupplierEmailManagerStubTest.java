@@ -3,6 +3,7 @@ package nz.co.dhafir.supplier.manager;
 import nz.co.dhafir.supplier.datastore.impl.EmailDAOStub;
 import nz.co.dhafir.supplier.domain.Email;
 import nz.co.dhafir.supplier.service.EmailService;
+import nz.co.dhafir.supplier.types.EmailStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,7 +59,7 @@ class SupplierEmailManagerStubTest {
         when(emailDAOStub.createDraftEmail(100L, email)).thenReturn(email);
         supplierEmailManagerStub.sendEmail(100L, email);
         verify(emailService).sendEmail(email);
-        assertFalse(email.isSent());
+        assertThat(email.getStatus()).isEqualTo(EmailStatus.SENT);
     }
 
     @Test

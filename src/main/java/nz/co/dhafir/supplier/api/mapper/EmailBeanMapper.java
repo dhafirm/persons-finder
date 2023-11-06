@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 public class EmailBeanMapper {
 
    public EmailResponseDTO fromDomainToEmailResponseDTO(@NotNull Email email) {
-       log.info("Email draft status:" + email.isSent());
+
        return EmailResponseDTO.builder()
                 .id(email.getId())
                 .sender(email.getSender())
                 .recipients(List.copyOf(email.getRecipients()))
                 .body(email.getBody())
                 .subject(email.getSubject())
-                .sent(email.isSent())
+                .status(email.getStatus())
                 .build();
 
    }

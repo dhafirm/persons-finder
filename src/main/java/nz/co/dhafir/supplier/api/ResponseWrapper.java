@@ -15,11 +15,11 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseWrapper {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    public STATUS status = STATUS.SUCCESS;
+    private Status status = Status.SUCCESS;
     /**
-     * s\Success message (optional)
+     * message (optional)
      */
-    public String message;
+    private String message;
     private Object data;
     private List<ErrorInfo> errors = new ArrayList<>();
 
@@ -27,7 +27,7 @@ public class ResponseWrapper {
         errors.add(new ErrorInfo(code, message));
     }
 
-     public static enum STATUS { SUCCESS, ERROR }
+    public enum Status { SUCCESS, ERROR }
 
     @Getter
     @AllArgsConstructor
