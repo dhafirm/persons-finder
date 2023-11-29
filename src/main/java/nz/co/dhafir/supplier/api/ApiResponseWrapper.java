@@ -13,9 +13,8 @@ import java.util.List;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseWrapper {
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Status status = Status.SUCCESS;
+public class ApiResponseWrapper {
+
     /**
      * message (optional)
      */
@@ -27,7 +26,6 @@ public class ResponseWrapper {
         errors.add(new ErrorInfo(code, message));
     }
 
-    public enum Status { SUCCESS, ERROR }
 
     @Getter
     @AllArgsConstructor
