@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/suppliers/{supplierId}/emails")
+@RequestMapping("/api/v1/suppliers/{supplierId}/")
 public class EmailResourceV1 {
 
     @Autowired
@@ -34,7 +34,7 @@ public class EmailResourceV1 {
      * @param supplierId
      * @return
      */
-    @GetMapping
+    @GetMapping("emails")
     public ResponseEntity<ApiResponseWrapper> getSupplierEmails(@PathVariable long supplierId) {
         List<Email> emails = emailServiceStub.findSupplierEmails(supplierId);
         ApiResponseWrapper responseWrapper = new ApiResponseWrapper();
@@ -54,7 +54,7 @@ public class EmailResourceV1 {
      * @param emailId
      * @return
      */
-    @GetMapping("/{emailId}")
+    @GetMapping("/emails/{emailId}")
     public ResponseEntity<ApiResponseWrapper> getSupplierEmailByEmailId(@PathVariable long supplierId, @PathVariable long emailId) {
         try {
             Optional<Email> maybeEmail = emailServiceStub.findSupplierEmailByEmailId(supplierId, emailId);
@@ -73,7 +73,7 @@ public class EmailResourceV1 {
         }
     }
 
-    @PostMapping
+    @PostMapping("emails")
     public ResponseEntity<ApiResponseWrapper> createEmail(@PathVariable long supplierId,
                                           @RequestBody EmailRequestDTO emailDto) {
         try {
@@ -88,13 +88,11 @@ public class EmailResourceV1 {
         }
     }
 
-    @PostMapping("/send")
-    public ResponseEntity<ApiResponseWrapper> sendEmail(@PathVariable long supplierId,
-                                                        @RequestBody EmailRequestDTO emailDto) {
+    @PostMapping("/emails/{emailId}")
+    public ResponseEntity<ApiResponseWrapper> sendEmail(@PathVariable long supplierId, @PathVariable long emailId) {
         try {
-
-            Email email = emailBeanMapper.fromEmailRequestDtoToDomain(emailDto);
-            emailServiceStub.sendEmail(supplierId, email);
+            log.info("Sending email with emailId: " + emailId);
+            emailServiceStub.sendEmail(supplierId, emailId);
             ApiResponseWrapper responseWrapper =  ApiResponseWrapper.builder()
                 .message("Email sent successfully")
                 .build();
@@ -102,27 +100,6 @@ public class EmailResourceV1 {
         } catch (Exception exp) {
             log.error("Sending email failed.", exp);
             return errorResponse("Couldn't send email.");
-        }
-    }
-
-    /**
-     * Send a draft email.
-     * @param supplierId
-     * @param emailId
-     * @return
-     */
-    @PostMapping("/{emailId}/send")
-    public ResponseEntity<ApiResponseWrapper> sendEmail(@PathVariable long supplierId,
-                                        @PathVariable long emailId) {
-        try {
-            emailServiceStub.sendEmail(supplierId, emailId);
-            ApiResponseWrapper responseWrapper =  ApiResponseWrapper.builder()
-                    .message("Email sent successfully")
-                    .build();
-            return ResponseEntity.ok().body(responseWrapper);
-        } catch (Exception exp) {
-            log.error("Sending email failed.", exp);
-            return errorResponse("Couldn't send email Id:");
         }
     }
 
@@ -134,7 +111,7 @@ public class EmailResourceV1 {
      * @param emailDto
      * @return
      */
-    @PutMapping("/{emailId}")
+    @PutMapping("/emails/{emailId}")
     public ResponseEntity<ApiResponseWrapper> updateDraft(@PathVariable long supplierId,
                                           @PathVariable long emailId,
                                           @RequestBody EmailRequestDTO emailDto) {
