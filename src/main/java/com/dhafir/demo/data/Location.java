@@ -9,15 +9,16 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 public class Location {
-    // id refers to Person::personId
+    // id refers to Person::id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long referenceId;
 
     private Double latitude;
     private Double longitude;
 
     @OneToOne
-    @JoinColumn(name = "id") // Referencing the primary key of Person table
+    @MapsId
+    @JoinColumn(name = "reference_id") // Referencing the primary key of Person table
     private Person person;
 }

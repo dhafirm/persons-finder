@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,7 +36,7 @@ public class PersonsController {
      * @param personId
      * @param longLat
      */
-    @PutMapping("/locations/{personId}")
+    @PutMapping("/{personId}/locations")
     public ResponseEntity updatePersonLocation(@PathVariable long personId, @RequestBody LongLat longLat) {
         // Sanity check 1: validate LongLat
         if (longLat == null) {
@@ -52,19 +51,41 @@ public class PersonsController {
 
         // see if location exist!
         Location location = new Location();
-        location.setId(person.getId());
         location.setLongitude(longLat.getLongitude());
         location.setLatitude(longLat.getLatitude());
+        location.setPerson(person);
 
         locationsServic.addLocation(location);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Retrieves persons location
+     * @param personId
+     * @return
+     */
+    @GetMapping("/{personId}/locations")
+    public ResponseEntity<LongLat> getPersonLocation(@PathVariable long personId) {
+        // Sanity check 1: find the person first
+        Person person = personsService.getById(personId);
+        if(person == null) {
+            return errorResponse("No person was found with id: " + personId);
+        }
+
+        Location location = locationsServic.findLocation(personId);
+        if(location == null) {
+            return errorResponse("No location was found for a person with id: " + personId);
+        }
+
+        locationsServic.addLocation(location);
+        return ResponseEntity.ok().body( LongLat.of(location));
     }
 
     /*
         TODO POST API to create a 'person'
         (JSON) Body and return the id of the created entity
     */
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Long> createPerson(@RequestBody String name) {
         Person person = new Person();
         person.setName(name);
@@ -97,7 +118,7 @@ public class PersonsController {
         }
 
         List<Long> personsIds = locations.stream()
-                .map(Location::getId)
+                .map(Location::getReferenceId)
                 .filter(id -> id != personId) // remove our own location
                 .collect(Collectors.toList());
 
@@ -113,7 +134,7 @@ public class PersonsController {
      */
 
     /**
-     * Retrieves persons name goven persons id
+     * Retrieves persons name given person id.
      * @param personId
      * @return
      */
@@ -127,8 +148,15 @@ public class PersonsController {
         return  ResponseEntity.ok().body(person.getName());
     }
 
-    @GetMapping("/names")
+    /**
+     * Retrieves person names by their ids as a comma delimited request parameter.
+     * Example: ?ids=1000,1010,1200
+     * @param ids
+     * @return
+     */
+    @GetMapping
     public ResponseEntity<List<String>> getPersonsNameByIds(@RequestParam String ids) {
+        //Ids is a comma delimited string of person Ids
         List<Long> personsIds = Arrays.stream(ids.split(",")).map(id -> Long.valueOf(id)).collect(Collectors.toList());
         List<Person> persons = personsService.getByIds(personsIds);
         if(CollectionUtils.isEmpty(persons)) {
@@ -140,7 +168,7 @@ public class PersonsController {
     }
 
 
-    @GetMapping("")
+    @GetMapping("/hello")
     public String getExample() {
         return "Hello Example";
     }

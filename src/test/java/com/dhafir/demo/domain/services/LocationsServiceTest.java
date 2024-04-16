@@ -1,6 +1,7 @@
 package com.dhafir.demo.domain.services;
 
 import com.dhafir.demo.data.Location;
+import com.dhafir.demo.data.Person;
 import com.dhafir.demo.datastore.LocationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -34,6 +34,8 @@ class LocationsServiceTest {
         Location location = new Location();
         location.setLongitude(longitude);
         location.setLatitude(latitude);
+        Person person = new Person();
+        location.setPerson(person);
         when(locationRepositoryMock.save(location)).thenReturn(location);
 
         locationsService.addLocation(location);

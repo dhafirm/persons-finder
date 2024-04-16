@@ -28,24 +28,34 @@ public class LocationsServiceImpl implements LocationsService {
 
     @Override
     public void addLocation(Location location) {
-        log.info("Adding location with long longitude {} and latitude {}",
-                location.getLongitude(),
-                location.getLatitude());
-        locationRepository.save(location);
+        Location savedLocation = locationRepository.save(location);
+        log.info("Added location with longitude {} and latitude {} for person {}",
+                savedLocation.getLongitude(),
+                savedLocation.getLatitude(),
+                savedLocation.getPerson().getName());
     }
+
 
     @Override
     public void removeLocation(long locationId) {
         locationRepository.deleteById(locationId);
+        log.info("Removed location  {}", locationId);
+    }
+
+    @Override
+    public Location findLocation(long id) {
+        return locationRepository.findById(id).orElse(null);
     }
 
     @Override
     public List<Location> findAround(double latitude, double longitude, double radiusInKm) {
+        log.info("Finding all locations around the given location within a radius of {} Km", radiusInKm);
         List<Location> locationsAround = locationRepository.findLocationsAround(latitude, longitude, radiusInKm);
         // Create a custom comparator based on distance between locations
         LongLat referenceLocation = new LongLat(latitude, longitude);
         Comparator<Location> distanceComparator = Comparator.comparingDouble(location -> calculateDistance(LongLat.of(location), referenceLocation));
         Collections.sort(locationsAround, distanceComparator);
+        log.info("Found {} locations around.", locationsAround.size() - 1);// exclude our own location
         return locationsAround;
     }
 

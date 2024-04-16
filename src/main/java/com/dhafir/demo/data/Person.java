@@ -16,7 +16,6 @@ public class Person {
 
     private String name;
 
-    @OneToOne
-    @JoinColumn(name = "id") // Referencing the primary key of Location table
+    @OneToOne(mappedBy = "person") // Referencing the primary key of Location table
     private Location location;
 }

@@ -71,20 +71,24 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/suppliers/1/emails",
+					"raw": "{{base_url}}/api/v1/persons?ids=1,2,3,4,5,6",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
-						"suppliers",
-						"1",
-						"emails"
+						"api",
+						"v1",
+						"persons"
 					],
 					"query": [
 						{
 							"key": "id",
 							"value": "1",
 							"disabled": true
+						},
+						{
+							"key": "ids",
+							"value": "1,2,3,4,5,6"
 						}
 					]
 				},
@@ -180,6 +184,60 @@
 		},
 		{
 			"name": "people around",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful DELETE request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/persons/1/people-around?radius=10.2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"persons",
+						"1",
+						"people-around"
+					],
+					"query": [
+						{
+							"key": "radius",
+							"value": "10.2"
+						}
+					]
+				},
+				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "find location",
 			"event": [
 				{
 					"listen": "test",
