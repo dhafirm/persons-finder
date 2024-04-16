@@ -1,4 +1,4 @@
-package nz.co.dhafir.supplier.types;
+package com.dhafir.demo.types;
 
 import lombok.AllArgsConstructor;
 
