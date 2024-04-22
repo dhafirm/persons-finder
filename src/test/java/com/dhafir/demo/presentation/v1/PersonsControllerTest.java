@@ -5,6 +5,7 @@ import com.dhafir.demo.data.LongLat;
 import com.dhafir.demo.data.Person;
 import com.dhafir.demo.domain.services.LocationsService;
 import com.dhafir.demo.domain.services.PersonsService;
+import com.dhafir.demo.presentation.dto.PersonDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,19 +34,20 @@ class PersonsControllerTest {
 
     @InjectMocks
     private PersonsController personsController;
+
     @Test
-    void updatePersonLocation_shouldReturnErro404IfPersonNotFound() {
+    void updateOrCreateLocation_shouldReturnErro404IfPersonNotFound() {
         when(personsServiceMock.getById(1000L)).thenReturn(null);
 
         double latitude = 74.1111;
         double longitude = 80.2222;
-        ResponseEntity response = personsController.updatePersonLocation(1000L, new LongLat(latitude, longitude));
+        ResponseEntity response = personsController.updateOrCreateLocation(1000L, new LongLat(latitude, longitude));
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
 
     @Test
-    void updatePersonLocation_shouldReturnOkIfPersonExists() {
+    void updateOrCreateLocation_shouldReturnOkIfPersonExists() {
         Person person = new Person();
         person.setId(1000L);
         when(personsServiceMock.getById(1000L)).thenReturn(person);
@@ -53,18 +55,61 @@ class PersonsControllerTest {
         Location location = new Location();
         double latitude = 74.1111;
         double longitude = 80.2222;
-        ResponseEntity response = personsController.updatePersonLocation(1000L, new LongLat(latitude, longitude));
+        ResponseEntity response = personsController.updateOrCreateLocation(1000L, new LongLat(latitude, longitude));
 
-        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.ACCEPTED));
+    }
+
+    @Test
+    void createPerson_shouldReturn400IfPersonNameIsMissing() {
+        // given
+        PersonDTO personDto = new PersonDTO();
+
+        // when
+        ResponseEntity response = personsController.createPerson(personDto);
+
+        // assert
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+
+    @Test
+    void createPerson_shouldReturn400IfPersonNameIsEmpty() {
+        // given
+        PersonDTO personDto = new PersonDTO();
+        personDto.setName("");
+
+        // when
+        ResponseEntity response = personsController.createPerson(personDto);
+
+        // assert
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void createPerson_shouldReturn422IfFailedToCreatePerson() {
+        Person person = new Person();
+        person.setId(1000L);
+        Mockito.lenient().when(personsServiceMock.save(person)).thenReturn(null);
+
+        PersonDTO personDTO = new PersonDTO();
+        personDTO.setName("John");
+        ResponseEntity response = personsController.createPerson(personDTO);
+
+        verify(personsServiceMock).save(any(Person.class));
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.UNPROCESSABLE_ENTITY));
+
     }
 
     @Test
     void createPerson_shouldReturnOk() {
-        Person savedPerson = new Person();
-        savedPerson.setId(1000L);
-        Mockito.lenient().when(personsServiceMock.save(any(Person.class))).thenReturn(savedPerson);
+        Person newPerson = new Person();
+        newPerson.setId(1000L);
+        Mockito.lenient().when(personsServiceMock.save(any(Person.class))).thenReturn(newPerson);
 
-        ResponseEntity response = personsController.createPerson(any(String.class));
+        PersonDTO personDTO = new PersonDTO();
+        personDTO.setName("John");
+        ResponseEntity response = personsController.createPerson(personDTO);
 
         verify(personsServiceMock).save(any(Person.class));
         assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));

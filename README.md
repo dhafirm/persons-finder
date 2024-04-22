@@ -1,8 +1,8 @@
 # Welcome
 
-This is a start-up Git repo for a project we are calling 'Persons finder'.
+This is a Git repo for a project called 'Persons finder' to demo the use of REST API.
 
-Your job is to create a set of API's that will feed a mobile application that has one purpose: find people around you.
+The idea is to create a set of API's that will feed a mobile application that has one purpose: find people around you.
 
 Requirements:
 - POST API to create a 'person'
@@ -12,16 +12,3 @@ Requirements:
 - Responses must follow a JSON format
 
 You'll also need to build the logic and services for saving/retrieving locations and persons.
-
-Steps:
-- Clone the project
-- Implement required API's and services
-- Push your project to your personal github
-
-
-### Extra challenge
-### Add a million, 10 million and 100 million entries and challenge your API's efficiency 
-
-For any questions, please reach out on: leo@getsquareone.app
-
-
